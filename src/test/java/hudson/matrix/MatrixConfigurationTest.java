@@ -40,7 +40,7 @@ public class MatrixConfigurationTest {
     
     @Test
     public void testDelete() throws Exception{
-        MatrixProject project = r.createMatrixProject();
+        MatrixProject project = r.createProject(MatrixProject.class);
         AxisList axes = new AxisList(
             new Axis("a","active1","active2", "unactive"));
         project.setAxes(axes);
@@ -59,12 +59,12 @@ public class MatrixConfigurationTest {
     
     @Test @Issue("JENKINS-32423")
     public void doNotServeConfigurePage() throws Exception {
-        MatrixProject p = r.createMatrixProject();
+        MatrixProject p = r.createProject(MatrixProject.class);
         p.setAxes(new AxisList(new Axis("a", "b")));
 
         WebClient wc = r.createWebClient();
-        wc.setThrowExceptionOnFailingStatusCode(false);
-        wc.setPrintContentOnFailingStatusCode(false);
+        wc.getOptions().setThrowExceptionOnFailingStatusCode(false);
+        wc.getOptions().setPrintContentOnFailingStatusCode(false);
 
         HtmlPage page = wc.getPage(p.getItem("a=b"), "configure");
         assertEquals("Page should not exist", 404, page.getWebResponse().getStatusCode());

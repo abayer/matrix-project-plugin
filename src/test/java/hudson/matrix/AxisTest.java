@@ -27,6 +27,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
+import com.gargoylesoftware.htmlunit.html.HtmlFormUtil;
 import hudson.model.JDK;
 
 import org.hamcrest.collection.IsEmptyCollection;
@@ -49,7 +50,7 @@ public class AxisTest {
     @Before
     public void setUp() throws Exception {
         wc = j.createWebClient();
-        p = j.createMatrixProject();
+        p = j.createProject(MatrixProject.class);
 
         // Setup to make all axes available
         j.jenkins.getJDKs().add(new JDK("jdk1.7", "/fake/home"));
@@ -58,7 +59,7 @@ public class AxisTest {
 
     @Test
     public void submitEmptyAxisName() throws Exception {
-        wc.setThrowExceptionOnFailingStatusCode(false);
+        wc.getOptions().setThrowExceptionOnFailingStatusCode(false);
 
         final String expectedMsg = "Matrix axis name '' is invalid: Axis name can not be empty";
         assertFailedWith(expectedMsg, withName("", "User-defined Axis"));
@@ -68,7 +69,7 @@ public class AxisTest {
 
     @Test
     public void submitInvalidAxisName() throws Exception {
-        wc.setThrowExceptionOnFailingStatusCode(false);
+        wc.getOptions().setThrowExceptionOnFailingStatusCode(false);
 
         String expectedMsg = "Matrix axis name 'a,b' is invalid: ‘,’ is an unsafe character";
         assertFailedWith(expectedMsg, withName("a,b", "User-defined Axis"));
@@ -83,7 +84,7 @@ public class AxisTest {
 
     @Test
     public void submitInvalidAxisValue() throws Exception {
-        wc.setThrowExceptionOnFailingStatusCode(false);
+        wc.getOptions().setThrowExceptionOnFailingStatusCode(false);
 
         HtmlForm form = addAxis("User-defined Axis");
         form.getInputByName("_.name").setValueAttribute("a_name");
@@ -135,7 +136,7 @@ public class AxisTest {
     private HtmlForm addAxis(String axis) throws Exception {
         HtmlPage page = wc.getPage(p, "configure");
         HtmlForm form = page.getFormByName("config");
-        form.getButtonByCaption("Add axis").click();
+        HtmlFormUtil.getButtonByCaption(form, "Add axis").click();
         page.getAnchorByText(axis).click();
         return form;
     }
